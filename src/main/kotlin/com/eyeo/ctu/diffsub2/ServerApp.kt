@@ -13,7 +13,7 @@ class ServerApp(
 
     companion object {
         @JvmStatic
-        fun main() {
+        fun main(args: Array<String>) {
             // wire
             val app = ServerApp(
                 ThombergsDiffParser(),
