@@ -25,8 +25,9 @@ class ThombergsDiffParser : DiffParser {
             for (eachHunk in eachDiff.hunks) {
                 for (eachLine in eachHunk.lines) {
                     when (eachLine.lineType) {
-                        Line.LineType.TO -> addRules.add(eachLine.content)
+                        Line.LineType.TO   -> addRules.add(eachLine.content)
                         Line.LineType.FROM -> removeRules.add(eachLine.content)
+                        else               -> { /* ignored */}
                     }
                 }
             }
