@@ -12,3 +12,17 @@ class PrintingSender : Sender {
         println(String(content))
     }
 }
+
+// Sender impl for Apache Kafka
+class KafkaSender(
+    val connection: String,
+    val topic: String
+) : Sender {
+    override fun send(content: ByteArray) {
+        TODO("Not yet implemented")
+    }
+
+    fun offset(): ULong {
+        TODO("Not yet implemented")
+    }
+}
