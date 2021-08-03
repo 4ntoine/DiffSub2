@@ -13,3 +13,11 @@ Test the app manually:
 Set up the Git hook:
 
     cp src/test/resources/update %git_repo_path%/hooks/
+
+Set up Docker-compose for `SenderTest`:
+
+In the `src/test/resources` directory
+
+    docker-compose up -d
+    ...
+    docker-compose down

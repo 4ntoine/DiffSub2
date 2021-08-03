@@ -17,6 +17,7 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation("io.reflectoring.diffparser:diffparser:1.4")
     implementation("org.slf4j:slf4j-nop:1.7.32") // to hide slf4j "Not configured" output
+    implementation("org.apache.kafka:kafka-clients:2.8.0")
 }
 
 tasks.test {
