@@ -6,9 +6,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ServerAppTest {
-    @Test
-    fun testFullFlow() {
-        val diffInput = """
+
+    companion object {
+        private val diffInput = """
         commit 5f5b3f27b7abaadec06abad523b6aab59a020f4a (HEAD -> master, origin/master)
         Author: Anton Smirnov <a.smirnov@eyeo.com>
         Date:   Sat Jul 31 00:40:21 2021 +0500
@@ -24,6 +24,10 @@ class ServerAppTest {
         -Rule2.
         \ No newline at end of file
         """.trimIndent()
+    }
+
+    @Test
+    fun testFullFlow() {
         val output = ByteArrayOutputStream()
         val app = ServerApp(
             ThombergsDiffParser(),
@@ -31,10 +35,26 @@ class ServerAppTest {
             OutputSender(output)
         )
         app.onHook(diffInput)
+        app.stop()
+
         // we don't care about the order (not guaranteed by Converter)
         val actualOutputLines = String(output.toByteArray()).split("\n")
         assertEquals(2, actualOutputLines.size)
         assertTrue(actualOutputLines.contains("-Rule2."))
         assertTrue(actualOutputLines.contains("+Rule1."))
+    }
+
+    @Test
+    fun testFullFlowKafka() {
+        val app = ServerApp(
+            ThombergsDiffParser(),
+            GitLikeConverter(),
+            KafkaSender("localhost:29092", "diffsub2")
+        )
+        try {
+            app.onHook(diffInput)
+        } finally {
+            app.stop()
+        }
     }
 }

@@ -23,7 +23,7 @@ class SenderTest {
 
     @After
     fun after() {
-        sender.disconnect()
+        sender.stop()
     }
 
     @Test

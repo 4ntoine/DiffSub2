@@ -12,7 +12,7 @@ class ClientApp(
         // TODO: this happens in KafkaReceiver thread, refactor to use a separate thread
         val diff = converter.convert(message)
         filterManager.apply(diff)
-        println("Client offset is $offset") // TODO: write offset to Persistence
+        println("Client topic offset is $offset") // TODO: write offset to Persistence
     }
 
     fun start() {

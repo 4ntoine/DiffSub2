@@ -6,6 +6,8 @@ Test the code:
 
 # Server-side
 
+In the `server` directory.
+
 Build the server app:
 
     ../gradlew clean shadowJar
@@ -27,4 +29,20 @@ In the `src/test/resources` directory
     docker-compose down
 
 # Client-side
+
+In project root directory.
+
+Start-up Docker-compose and (optionally) create a topic with Server app:
+
+    java -jar ./server/build/libs/server-0.1-all.jar localhost:29092 diffsub2 create
+
+Compile the source code and start the client:
+
+    java -jar ./client/build/libs/client-0.1-all.jar localhost:29092 diffsub2 100
+
+Send a test diff with server app:
+
+    cat server/src/test/resources/diff.txt | java -jar ./server/build/libs/server-0.1-all.jar localhost:29092 diffsub2 send
+
+Make sure you can see the diff received by the client app.
 

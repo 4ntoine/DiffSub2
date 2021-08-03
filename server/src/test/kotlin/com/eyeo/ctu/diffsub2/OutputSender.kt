@@ -9,4 +9,8 @@ class OutputSender (
     override fun send(content: ByteArray) {
         output.write(content)
     }
+
+    override fun stop() {
+        // nothing
+    }
 }

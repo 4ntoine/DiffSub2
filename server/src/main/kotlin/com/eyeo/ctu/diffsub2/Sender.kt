@@ -16,6 +16,7 @@ import kotlin.concurrent.write
 // sends a message to the broker
 interface Sender {
     fun send(content: ByteArray) // asynchronously
+    fun stop()
 }
 
 // Sender impl that just print to standard output
@@ -23,6 +24,10 @@ interface Sender {
 class PrintingSender : Sender {
     override fun send(content: ByteArray) {
         println(String(content))
+    }
+
+    override fun stop() {
+        // nothing
     }
 }
 
@@ -69,7 +74,7 @@ class KafkaSender(
                     offset = AtomicLong(0)
                 }
                 offset!!.set(it.offset())
-                println("New offset is $offset")
+                println("Server topic offset is $offset")
             }
         }
     }
@@ -99,6 +104,7 @@ class KafkaSender(
 
     override fun send(content: ByteArray) {
         producer.send(ProducerRecord(topic, "key", content), ::sendCallback)
+        producer.flush()
     }
 
     fun offset(): Long? {
@@ -107,8 +113,7 @@ class KafkaSender(
         }
     }
 
-    fun disconnect() {
-        producer.flush()
+    override fun stop() {
         producer.close() // it will wait for send() actually finished
     }
 }
