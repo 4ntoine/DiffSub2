@@ -49,6 +49,11 @@ class KafkaReceiver(
         allProperties[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = ByteArrayDeserializer::class.java.name
         allProperties[ConsumerConfig.GROUP_ID_CONFIG] = "demo-consumer-1"
         allProperties[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+
+        if (ConsumerConfig.DEFAULT_API_TIMEOUT_MS_CONFIG !in allProperties) {
+            // needed to check the connection (ctor does not throw an exception)
+            allProperties[ConsumerConfig.DEFAULT_API_TIMEOUT_MS_CONFIG] = 5_000 // 5 seconds
+        }
     }
 
     override fun setListener(listener: ReceiverListener) {
@@ -57,6 +62,7 @@ class KafkaReceiver(
 
     override fun start() {
         consumer = KafkaConsumer(allProperties)
+        consumer.listTopics() // to force it throw a connection exception if not connected
         consumer.subscribe(listOf(topic))
         thread(start = true) {
             consumer.use { consumer ->
@@ -78,7 +84,9 @@ class KafkaReceiver(
     // is asynchronous (not waiting for actual consumer closed)
     override fun stop() {
         // we could make it synchronous
-        signalClose.set(true)
-        consumer.wakeup() // to shake it in cas of long poll interval
+        if (this::consumer.isInitialized) {
+            signalClose.set(true)
+            consumer.wakeup() // to shake it in cas of long poll interval
+        }
     }
 }

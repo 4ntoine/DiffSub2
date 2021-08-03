@@ -6,8 +6,11 @@ import org.junit.Ignore
 import org.junit.Test
 import java.lang.Thread.sleep
 import java.time.Duration
+import kotlin.math.absoluteValue
+import kotlin.random.Random
+import kotlin.test.fail
 
-@Ignore // For manual run only (required Kafka running)
+//@Ignore // For manual run only (required Kafka running)
 class SenderTest {
     companion object {
         private const val TOPIC = "diffsub2"
@@ -35,5 +38,17 @@ class SenderTest {
     fun testReceive() {
         receiver.start()
         sleep(5_000) // let if receive something
+    }
+
+    @Test
+    fun testReceiveConnectionErrorReported() {
+        val invalidPort = 10240 + Random.nextInt(1024).absoluteValue
+        try {
+            KafkaReceiver("localhost:$invalidPort", TOPIC, Duration.ofMillis(100))
+                .start()
+            fail("Received is expected to report a connection error")
+        } catch (e: Exception) {
+            // expected
+        }
     }
 }
