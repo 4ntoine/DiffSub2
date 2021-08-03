@@ -37,6 +37,12 @@ class SenderTest {
     }
 
     @Test
+    // the test can be useful for testing with ClientApp actually running and waiting for the events
+    fun testSendRules() {
+        sender.send("+Rule1\n-Rule2".toByteArray())
+    }
+
+    @Test
     fun testOffsetIsIncreasing() {
         for (i in 0..3) {
             val offset = sender.offset()

@@ -16,13 +16,14 @@ typealias ReceiverListener = (/* offset */ Long, /* message */ ByteArray) -> Uni
 interface Receiver {
     fun setListener(listener: ReceiverListener)
     fun start() // requires listener to be set with `setListener()`
+    fun stop()
 }
 
 // Sender impl for Apache Kafka
 class KafkaReceiver(
     val connection: String, // eg. "localhost:9092"
-    val pollDuration: Duration,
     val topic: String,
+    val pollDuration: Duration,
     properties: Properties? = null
 ) : Receiver {
 
@@ -69,7 +70,7 @@ class KafkaReceiver(
     }
 
     // is asynchronous (not waiting for actual consumer closed)
-    fun disconnect() {
+    override fun stop() {
         // we could make it synchronous
         signalClose.set(true)
     }

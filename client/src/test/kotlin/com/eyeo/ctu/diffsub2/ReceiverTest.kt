@@ -6,7 +6,6 @@ import org.junit.Ignore
 import org.junit.Test
 import java.lang.Thread.sleep
 import java.time.Duration
-import kotlin.test.assertTrue
 
 @Ignore // For manual run only (required Kafka running)
 class SenderTest {
@@ -22,13 +21,13 @@ class SenderTest {
     @Before
     fun before() {
         // create a new sender before each test method to avoid interference
-        receiver = KafkaReceiver("localhost:29092", Duration.ofMillis(100), TOPIC)
+        receiver = KafkaReceiver("localhost:29092", TOPIC, Duration.ofMillis(100))
         receiver.setListener(::onMessage)
     }
 
     @After
     fun after() {
-        receiver.disconnect()
+        receiver.stop()
         sleep(1_000) // let it actually disconnect
     }
 
