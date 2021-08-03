@@ -27,7 +27,7 @@ class ThombergsDiffParser : DiffParser {
                     when (eachLine.lineType) {
                         Line.LineType.TO   -> addRules.add(eachLine.content)
                         Line.LineType.FROM -> removeRules.add(eachLine.content)
-                        else               -> { /* ignored */}
+                        else               -> { /* ignored */ }
                     }
                 }
             }

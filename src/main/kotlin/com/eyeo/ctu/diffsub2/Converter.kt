@@ -1,6 +1,6 @@
 package com.eyeo.ctu.diffsub2
 
-// converts between Diff and to Broker message content
+// converts between Diff and Broker message content
 interface Converter {
     fun encode(diff: Diff): ByteArray
 }
