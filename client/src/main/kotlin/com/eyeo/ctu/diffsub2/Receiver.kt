@@ -3,6 +3,7 @@ package com.eyeo.ctu.diffsub2
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.common.errors.WakeupException
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.Duration
@@ -27,7 +28,8 @@ class KafkaReceiver(
     properties: Properties? = null
 ) : Receiver {
 
-    private val consumer: Consumer<String, ByteArray>
+    private val allProperties: Properties
+    private lateinit var consumer: Consumer<String, ByteArray>
     private val signalClose = AtomicBoolean(false)
     private lateinit var listener: ReceiverListener
 
@@ -37,7 +39,7 @@ class KafkaReceiver(
 
     init {
         // adjust properties
-        val allProperties = if (properties != null) Properties(properties) else Properties()
+        allProperties = if (properties != null) Properties(properties) else Properties()
 
         // connection
         allProperties[BOOTSTRAP_SERVERS] = connection
@@ -47,8 +49,6 @@ class KafkaReceiver(
         allProperties[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = ByteArrayDeserializer::class.java.name
         allProperties[ConsumerConfig.GROUP_ID_CONFIG] = "demo-consumer-1"
         allProperties[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
-
-        consumer = KafkaConsumer(allProperties)
     }
 
     override fun setListener(listener: ReceiverListener) {
@@ -56,13 +56,19 @@ class KafkaReceiver(
     }
 
     override fun start() {
+        consumer = KafkaConsumer(allProperties)
         consumer.subscribe(listOf(topic))
         thread(start = true) {
             consumer.use { consumer ->
                 while (!signalClose.get()) {
                     // polling! TODO: how to switch to long polling?
-                    for (eachRecord in consumer.poll(pollDuration)) {
-                        this.listener(eachRecord.offset(), eachRecord.value())
+                    try {
+                        for (eachRecord in consumer.poll(pollDuration)) {
+                            this.listener(eachRecord.offset(), eachRecord.value())
+                        }
+                    } catch (e: WakeupException) {
+                        if (!signalClose.get())
+                            throw e
                     }
                 }
             }
@@ -73,5 +79,6 @@ class KafkaReceiver(
     override fun stop() {
         // we could make it synchronous
         signalClose.set(true)
+        consumer.wakeup() // to shake it in cas of long poll interval
     }
 }
