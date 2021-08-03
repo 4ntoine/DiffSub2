@@ -1,10 +1,14 @@
-Build the server app:
-
-    ./gradlew clean shadowJar
+# General
 
 Test the code:
 
-    ./gradlew test
+    ../gradlew test
+
+# Server-side
+
+Build the server app:
+
+    ../gradlew clean shadowJar
 
 Test the app manually:
 
@@ -21,3 +25,6 @@ In the `src/test/resources` directory
     docker-compose up -d
     ...
     docker-compose down
+
+# Client-side
+

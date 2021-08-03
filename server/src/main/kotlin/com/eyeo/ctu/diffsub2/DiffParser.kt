@@ -2,12 +2,6 @@ package com.eyeo.ctu.diffsub2
 
 import io.reflectoring.diffparser.api.UnifiedDiffParser
 import io.reflectoring.diffparser.api.model.Line
-import java.io.FileInputStream
-
-data class Diff(
-    val add: List<String>,
-    val remove: List<String>
-)
 
 // parses UnifiedDiff produced by Git (git diff)
 interface DiffParser {

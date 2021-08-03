@@ -13,7 +13,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 
-
 // sends a message to the broker
 interface Sender {
     fun send(content: ByteArray) // asynchronously
