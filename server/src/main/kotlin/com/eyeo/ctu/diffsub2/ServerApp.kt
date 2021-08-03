@@ -7,7 +7,7 @@ class ServerApp(
 ) {
     fun onHook(diffInput: String) {
         val diff = parser.parse(diffInput)
-        val message = converter.encode(diff)
+        val message = converter.convert(diff)
         sender.send(message)
     }
 
