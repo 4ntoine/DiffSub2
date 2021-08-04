@@ -2,6 +2,7 @@ package com.eyeo.ctu.diffsub2
 
 import org.junit.Test
 import java.io.ByteArrayOutputStream
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -45,6 +46,7 @@ class ServerAppTest {
     }
 
     @Test
+    @Ignore // For manual run only (requires Kafka running)
     fun testFullFlowKafka() {
         val app = ServerApp(
             ThombergsDiffParser(),

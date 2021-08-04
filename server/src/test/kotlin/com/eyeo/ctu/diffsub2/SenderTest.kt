@@ -7,7 +7,7 @@ import org.junit.Test
 import java.lang.Thread.sleep
 import kotlin.test.assertTrue
 
-@Ignore // For manual run only (required Kafka running)
+@Ignore // For manual run only (requires Kafka running)
 class SenderTest {
     companion object {
         private const val TOPIC = "diffsub2"
