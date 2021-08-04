@@ -46,3 +46,6 @@ Send a test diff with server app:
 
 Make sure you can see the diff received by the client app.
 
+**Warning**: replace hardcoded (my) IP-address from 192.168.1.120 to "localhost" or your IP-address in "docker-compose.yml".
+Otherwise Kafka will not de reachable for non-local consumers.
+
