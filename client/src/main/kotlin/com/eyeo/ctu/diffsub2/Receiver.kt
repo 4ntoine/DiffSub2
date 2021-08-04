@@ -25,7 +25,8 @@ class KafkaReceiver(
     val connection: String, // eg. "localhost:9092"
     val topic: String,
     val pollDuration: Duration,
-    properties: Properties? = null
+    var groupId: String? = null,
+    properties: Properties? = null,
 ) : Receiver {
 
     private val allProperties: Properties
@@ -47,7 +48,12 @@ class KafkaReceiver(
         // details
         allProperties[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.name
         allProperties[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = ByteArrayDeserializer::class.java.name
-        allProperties[ConsumerConfig.GROUP_ID_CONFIG] = UUID.randomUUID().toString() // otherwise only 1 client will receive the changes
+
+        if (groupId == null) {
+            groupId = UUID.randomUUID().toString() // otherwise only 1 client will receive the changes
+            println("Generated groupId = $groupId")
+        }
+        allProperties[ConsumerConfig.GROUP_ID_CONFIG] = groupId
         allProperties[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
 
         if (ConsumerConfig.DEFAULT_API_TIMEOUT_MS_CONFIG !in allProperties) {

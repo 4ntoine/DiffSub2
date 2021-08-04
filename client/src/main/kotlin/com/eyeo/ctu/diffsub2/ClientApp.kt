@@ -28,8 +28,8 @@ class ClientApp(
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            if (args.size != 3) {
-                println("Usage: %connection% %topic% %poll_duration_millis%")
+            if (args.size < 3) {
+                println("Usage: %connection% %topic% %poll_duration_millis% (%groupId%)")
                 exitProcess(1)
             }
 
@@ -38,9 +38,12 @@ class ClientApp(
             val duration = Duration.ofMillis(args[2].toLong())
             println("Connecting to \"$connection\", topic \"$topic\" and polling with interval ${duration.toMillis()} millis ...")
 
+            // optional consumer groupId
+            val groupId: String? = if (args.size == 4) args[3] else null
+
             // wire
             val app = ClientApp(
-                KafkaReceiver(connection, topic, duration),
+                KafkaReceiver(connection, topic, duration, groupId),
                 GitLikeConverter(),
                 PrintingFilterManager()
             )
