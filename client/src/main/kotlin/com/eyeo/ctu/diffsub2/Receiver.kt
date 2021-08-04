@@ -3,6 +3,7 @@ package com.eyeo.ctu.diffsub2
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.errors.WakeupException
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -63,7 +64,17 @@ class KafkaReceiver(
     override fun start() {
         consumer = KafkaConsumer(allProperties)
         consumer.listTopics() // to force it throw a connection exception if not connected
-        consumer.subscribe(listOf(settings.topic))
+
+        // if we need to have the changes starting some point
+        // (eg. webext release, not from the beginning)
+        if (settings.offset != null) {
+            val partition = TopicPartition(settings.topic, 0)
+            consumer.assign(listOf(partition))
+            consumer.seek(partition, settings.offset!!)
+        } else {
+            consumer.subscribe(listOf(settings.topic))
+        }
+
         thread(start = true) {
             consumer.use { consumer ->
                 while (!signalClose.get()) {

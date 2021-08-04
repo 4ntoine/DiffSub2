@@ -22,6 +22,12 @@ class ClientApp(
             description = "Kafka consumer groupId (auto generated if not set)"
         )
         var groupId: String? = null
+
+        @Parameter(
+            names = ["-o", "-offset"],
+            description = "Kafka topic offset (optional)"
+        )
+        var offset: Long? = null
     }
 
     private fun onMessage(offset: Long, message: ByteArray) {

@@ -49,3 +49,11 @@ Make sure you can see the diff received by the client app.
 **Warning**: replace hardcoded (my) IP-address from 192.168.1.120 to "localhost" or your IP-address in "docker-compose.yml".
 Otherwise Kafka will not de reachable for non-local consumers.
 
+### Offset
+
+The clients can be interested in receiving of the changes starting some point (eg. release)
+and already having some state bundled (so no diff changed are needed until release time point).
+
+Use `-o` cmdline argument for client app for it:
+
+    java -jar ./client/build/libs/client-0.1-all.jar -h localhost -p 29092 -t diffsub2 -d 100 -o 5
