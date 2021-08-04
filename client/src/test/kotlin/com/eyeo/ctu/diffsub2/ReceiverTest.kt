@@ -5,12 +5,11 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import java.lang.Thread.sleep
-import java.time.Duration
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 import kotlin.test.fail
 
-//@Ignore // For manual run only (required Kafka running)
+@Ignore // For manual run only (required Kafka running)
 class SenderTest {
     companion object {
         private const val TOPIC = "diffsub2"
@@ -24,7 +23,13 @@ class SenderTest {
     @Before
     fun before() {
         // create a new sender before each test method to avoid interference
-        receiver = KafkaReceiver("localhost:29092", TOPIC, Duration.ofMillis(100))
+        val settings = ClientApp.Settings().apply {
+            host = "localhost"
+            port = 29092
+            topic = TOPIC
+            pollDurationMillis = 100
+        }
+        receiver = KafkaReceiver(settings)
         receiver.setListener(::onMessage)
     }
 
@@ -42,10 +47,15 @@ class SenderTest {
 
     @Test
     fun testReceiveConnectionErrorReported() {
-        val invalidPort = 10240 + Random.nextInt(1024).absoluteValue
+        val invalidPort = 10240L + Random.nextInt(1024).absoluteValue
+        val settings = ClientApp.Settings().apply {
+            host = "localhost"
+            port = invalidPort // invalid!
+            topic = TOPIC
+            pollDurationMillis = 100
+        }
         try {
-            KafkaReceiver("localhost:$invalidPort", TOPIC, Duration.ofMillis(100))
-                .start()
+            KafkaReceiver(settings).start()
             fail("Received is expected to report a connection error")
         } catch (e: Exception) {
             // expected

@@ -18,7 +18,12 @@ class SenderTest {
     @Before
     fun before() {
         // create a new sender before each test method to avoid interference
-        sender = KafkaSender("localhost:29092", TOPIC)
+        val settings = ServerApp.Settings().apply {
+            host = "localhost"
+            port = 29092
+            topic = TOPIC
+        }
+        sender = KafkaSender(settings)
     }
 
     @After

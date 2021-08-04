@@ -48,10 +48,15 @@ class ServerAppTest {
     @Test
     @Ignore // For manual run only (requires Kafka running)
     fun testFullFlowKafka() {
+        val settings = ServerApp.Settings().apply {
+            host = "localhost"
+            port = 29092
+            topic = "diffsub2"
+        }
         val app = ServerApp(
             ThombergsDiffParser(),
             GitLikeConverter(),
-            KafkaSender("localhost:29092", "diffsub2")
+            KafkaSender(settings)
         )
         try {
             app.onHook(diffInput)

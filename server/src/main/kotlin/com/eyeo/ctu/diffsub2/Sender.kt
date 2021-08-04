@@ -33,8 +33,9 @@ class PrintingSender : Sender {
 
 // Sender impl for Apache Kafka
 class KafkaSender(
-    val connection: String, // eg. "localhost:9092"
-    val topic: String,
+    // Ideally introduce and use `ReceiverSettings` here.
+    // However it fully corresponds to `ServerApp.Setting` and being pragmatic for POC i consider it ok.
+    val settings: ServerApp.Settings,
     properties: Properties? = null
 ) : Sender {
 
@@ -51,7 +52,7 @@ class KafkaSender(
         val allProperties = if (properties != null) Properties(properties) else Properties()
 
         // connection
-        allProperties[BOOTSTRAP_SERVERS] = connection
+        allProperties[BOOTSTRAP_SERVERS] = settings.connection()
 
         // details
         allProperties[ProducerConfig.ACKS_CONFIG] = "all"
@@ -63,7 +64,7 @@ class KafkaSender(
 
     private fun sendCallback(metadata: RecordMetadata?, exception: Exception?) {
         exception?.let {
-            println("Failed to send to the \"$topic\": $it")
+            println("Failed to send to the \"${settings.topic}\": $it")
             return
         }
 
@@ -83,7 +84,7 @@ class KafkaSender(
         val newTopic = NewTopic(topic, Optional.empty(), Optional.empty())
         try {
             val properties = Properties()
-            properties[BOOTSTRAP_SERVERS] = connection
+            properties[BOOTSTRAP_SERVERS] = settings.connection()
             AdminClient.create(properties).use { adminClient ->
                 adminClient
                     .createTopics(listOf(newTopic))
@@ -103,7 +104,7 @@ class KafkaSender(
     }
 
     override fun send(content: ByteArray) {
-        producer.send(ProducerRecord(topic, "key", content), ::sendCallback)
+        producer.send(ProducerRecord(settings.topic, "key", content), ::sendCallback)
         producer.flush()
     }
 

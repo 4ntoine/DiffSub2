@@ -22,10 +22,9 @@ interface Receiver {
 
 // Sender impl for Apache Kafka
 class KafkaReceiver(
-    val connection: String, // eg. "localhost:9092"
-    val topic: String,
-    val pollDuration: Duration,
-    var groupId: String? = null,
+    // Ideally introduce and use `ReceiverSettings` here.
+    // However it fully corresponds to `ClientApp.Setting` and being pragmatic for POC i consider it ok.
+    val settings: ClientApp.Settings,
     properties: Properties? = null,
 ) : Receiver {
 
@@ -43,17 +42,12 @@ class KafkaReceiver(
         allProperties = if (properties != null) Properties(properties) else Properties()
 
         // connection
-        allProperties[BOOTSTRAP_SERVERS] = connection
+        allProperties[BOOTSTRAP_SERVERS] = settings.connection()
 
         // details
         allProperties[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.name
         allProperties[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = ByteArrayDeserializer::class.java.name
-
-        if (groupId == null) {
-            groupId = UUID.randomUUID().toString() // otherwise only 1 client will receive the changes
-            println("Generated groupId = $groupId")
-        }
-        allProperties[ConsumerConfig.GROUP_ID_CONFIG] = groupId
+        allProperties[ConsumerConfig.GROUP_ID_CONFIG] = settings.groupId
         allProperties[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
 
         if (ConsumerConfig.DEFAULT_API_TIMEOUT_MS_CONFIG !in allProperties) {
@@ -69,13 +63,13 @@ class KafkaReceiver(
     override fun start() {
         consumer = KafkaConsumer(allProperties)
         consumer.listTopics() // to force it throw a connection exception if not connected
-        consumer.subscribe(listOf(topic))
+        consumer.subscribe(listOf(settings.topic))
         thread(start = true) {
             consumer.use { consumer ->
                 while (!signalClose.get()) {
                     // polling! TODO: how to switch to long polling?
                     try {
-                        for (eachRecord in consumer.poll(pollDuration)) {
+                        for (eachRecord in consumer.poll(Duration.ofMillis(settings.pollDurationMillis!!))) {
                             this.listener(eachRecord.offset(), eachRecord.value())
                         }
                     } catch (e: WakeupException) {

@@ -1,5 +1,7 @@
 package com.eyeo.ctu.diffsub2
 
+import com.beust.jcommander.JCommander
+import com.beust.jcommander.Parameter
 import kotlin.system.exitProcess
 
 class ServerApp(
@@ -7,6 +9,15 @@ class ServerApp(
     private val converter: Converter,
     private val sender: Sender
 ) {
+    class Settings : ConnectionSettings() {
+        @Parameter(
+            names = ["-a", "-action"],
+            description = """Action ("create" - create the topic, "send" - send stdin)""",
+            required = true
+        )
+        var action: String? = null
+    }
+
     fun onHook(diffInput: String) {
         val diff = parser.parse(diffInput)
         val message = converter.convert(diff)
@@ -20,18 +31,22 @@ class ServerApp(
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            if (args.size != 3) {
-                println("Usage: %connection% %topic% %action%=[create|send]")
+            var settings = Settings()
+            val parser = JCommander
+                .newBuilder()
+                .addObject(settings)
+                .build()
+            try {
+                parser.parse(*args)
+            } catch (e: Exception) {
+                println(e.message)
+                parser.usage() // prints to stdout
                 exitProcess(1)
             }
-
-            val connection = args[0]
-            val topic = args[1]
-            val action = args[2]
-            println("Connecting to \"$connection\", topic \"$topic\" ...")
+            println("Connecting to \"${settings.connection()}\", topic \"${settings.topic}\" ...")
 
             // wire
-            val kafkaSender = KafkaSender(connection, topic)
+            val kafkaSender = KafkaSender(settings)
             val app = ServerApp(
                 ThombergsDiffParser(),
                 GitLikeConverter(),
@@ -40,7 +55,7 @@ class ServerApp(
 
             // process
             try {
-                when (action) {
+                when (settings.action) {
                     "send" -> {
                         println("Sending a message")
                         val input = generateSequence(::readLine).joinToString("\n")
@@ -48,10 +63,10 @@ class ServerApp(
                     }
                     "create" -> {
                         println("Creating a topic")
-                        kafkaSender.createTopic(topic)
+                        kafkaSender.createTopic(settings.topic!!)
                     }
                     else -> {
-                        println("Unknown action: $action")
+                        println("Unknown action: ${settings.action}")
                         exitProcess(2)
                     }
                 }
