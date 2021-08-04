@@ -7,7 +7,7 @@ plugins {
 dependencies {
     implementation(project(":common"))
     testImplementation(kotlin("test"))
-    implementation("org.slf4j:slf4j-nop:1.7.32") // to hide slf4j "Not configured" output
+    implementation("org.slf4j:slf4j-simple:1.7.32")
     implementation("org.apache.kafka:kafka-clients:2.8.0")
 }
 
