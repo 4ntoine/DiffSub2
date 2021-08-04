@@ -14,7 +14,7 @@ Build the server app:
 
 Test the app manually:
 
-    cat src/test/resources/diff.txt | java -jar ./build/libs/DiffSub2-0.1-all.jar
+    cat src/test/resources/diff.txt | java -jar ./build/libs/server-all.jar
 
 Set up the Git hook:
 
@@ -34,15 +34,15 @@ In project root directory.
 
 Start-up Docker-compose and (optionally) create a topic with Server app:
 
-    java -jar ./server/build/libs/server-0.1-all.jar -h localhost -p 29092 -t diffsub2 -a create
+    java -jar ./server/build/libs/server-all.jar -h localhost -p 29092 -t diffsub2 -a create
 
 Compile the source code and start the client:
 
-    java -jar ./client/build/libs/client-0.1-all.jar -h localhost -p 29092 -t diffsub2 -d 100
+    java -jar ./client/build/libs/client-all.jar -h localhost -p 29092 -t diffsub2 -d 100
 
 Send a test diff with server app:
 
-    cat server/src/test/resources/diff.txt | java -jar ./server/build/libs/server-0.1-all.jar -h localhost -p 29092 -t diffsub2 -a send
+    cat server/src/test/resources/diff.txt | java -jar ./server/build/libs/server-all.jar -h localhost -p 29092 -t diffsub2 -a send
 
 Make sure you can see the diff received by the client app.
 
@@ -56,4 +56,4 @@ and already having some state bundled (so no diff changed are needed until relea
 
 Use `-o` cmdline argument for client app for it:
 
-    java -jar ./client/build/libs/client-0.1-all.jar -h localhost -p 29092 -t diffsub2 -d 100 -o 5
+    java -jar ./client/build/libs/client-all.jar -h localhost -p 29092 -t diffsub2 -d 100 -o 5

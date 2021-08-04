@@ -12,6 +12,6 @@ git_proc = subprocess.Popen("git diff -w %s %s" % (old_commit, new_commit), shel
 git_diff_output = "".join(git_proc.stdout.readlines())
 
 # Feed it to the server app
-server_app_proc = subprocess.Popen("java -jar ./hooks/server-0.1-all.jar -h localhost -p 29092 -t diffsub2 -a send", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+server_app_proc = subprocess.Popen("java -jar ./hooks/server-all.jar -h localhost -p 29092 -t diffsub2 -a send", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 server_app_output = server_app_proc.communicate(input=git_diff_output.encode())[0]
 print(server_app_output)
