@@ -2,7 +2,6 @@ package com.eyeo.ctu.diffsub2
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
-import java.util.*
 import kotlin.system.exitProcess
 
 class ServerApp(

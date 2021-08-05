@@ -2,11 +2,25 @@ package com.eyeo.ctu.diffsub2
 
 import org.junit.Test
 import java.io.ByteArrayOutputStream
+import java.io.OutputStream
 import kotlin.test.Ignore
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ServerAppTest {
+
+    // Sender impl that send into the output
+    private class OutputSender (
+        private val output: OutputStream
+    ) : Sender {
+        override fun send(content: ByteArray) {
+            output.write(content)
+        }
+
+        override fun stop() {
+            // nothing
+        }
+    }
 
     companion object {
         private val diffInput = """

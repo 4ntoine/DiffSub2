@@ -3,7 +3,7 @@ package com.eyeo.ctu.diffsub2
 import java.io.File
 
 // execute the command line and return the process output (stdout)
-fun execute(command: Array<String>, path: File): List<String> {
+fun execute(command: Array<String>): List<String> {
     val p = Runtime.getRuntime().exec(command, null)
     val output = p.inputStream.bufferedReader().readLines()
     val resultCode = p.waitFor()
@@ -24,16 +24,22 @@ class InvokingGitClient(
     private val gitRepoPath: File,
     private val ignoreSpaceChangeLines: Boolean = true
 ) : GitClient {
+
+    private fun executeGit(cmd: Array<String>): List<String> {
+        val allCmd = mutableListOf<String>()
+        allCmd.addAll(listOf("git", "--git-dir=${gitRepoPath.absolutePath}"))
+        allCmd.addAll(cmd)
+        return execute(allCmd.toTypedArray())
+    }
+
     override fun getHeadRevision(): String {
-        val cmd = arrayOf("git", "rev-parse", "HEAD")
-        val output = execute(cmd, gitRepoPath)
+        val output = executeGit(arrayOf("rev-parse", "HEAD"))
         return output.first().trim()
     }
 
     override fun getDiff(fromRevision: String, toRevision: String): String {
         val spaceChangeArg = if (ignoreSpaceChangeLines) "-w" else ""
-        val cmd = arrayOf("git", "diff", spaceChangeArg, fromRevision, toRevision)
-        val output = execute(cmd, gitRepoPath)
+        val output = executeGit(arrayOf("diff", spaceChangeArg, fromRevision, toRevision))
         return output.joinToString("\n")
     }
 }

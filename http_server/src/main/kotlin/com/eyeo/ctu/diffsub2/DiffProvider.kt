@@ -1,7 +1,5 @@
 package com.eyeo.ctu.diffsub2
 
-import java.io.File
-
 data class DiffRequest(
     val fromRevision: String,
     val toRevision: String? = null
