@@ -6,7 +6,7 @@ plugins {
 
 allprojects {
     group = "com.eyeo.ctu"
-    version = "0.9.1"
+    version = "0.9.2"
 
     repositories {
         mavenCentral()

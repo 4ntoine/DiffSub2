@@ -44,6 +44,8 @@ Send a test diff with server app:
 
     cat server/src/test/resources/diff.txt | java -jar ./server/build/libs/server-all.jar -h localhost -p 29092 -t diffsub2 -a send
 
+Use `-k` to pass a specific message key to be used while sending.
+
 Make sure you can see the diff received by the client app.
 
 **Warning**: replace hardcoded (my) IP-address from 192.168.1.120 to "localhost" or your IP-address in "docker-compose.yml".

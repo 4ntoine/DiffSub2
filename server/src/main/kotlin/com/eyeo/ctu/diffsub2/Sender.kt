@@ -104,7 +104,7 @@ class KafkaSender(
     }
 
     override fun send(content: ByteArray) {
-        producer.send(ProducerRecord(settings.topic, "key", content), ::sendCallback)
+        producer.send(ProducerRecord(settings.topic, settings.key, content), ::sendCallback)
         producer.flush()
     }
 

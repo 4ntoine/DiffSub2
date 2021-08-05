@@ -2,6 +2,7 @@ package com.eyeo.ctu.diffsub2
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
+import java.util.*
 import kotlin.system.exitProcess
 
 class ServerApp(
@@ -16,6 +17,15 @@ class ServerApp(
             required = true
         )
         var action: String? = null
+
+        // TODO: probably makes sense to pass key generator classname
+        // (interface + concrete impl classname) for some advanced cases.
+        // Seems to be not needed in POC.
+        @Parameter(
+            names = ["-k", "-key"],
+            description = "Kafka message key (auto generated from topic name if not set)"
+        )
+        var key: String? = null
     }
 
     fun onHook(diffInput: String) {
@@ -44,6 +54,13 @@ class ServerApp(
                 exitProcess(1)
             }
             println("Connecting to \"${settings.connection()}\", topic \"${settings.topic}\" ...")
+
+            // auto fill missing optional fields
+            // (it feels a bit strange as some fields could be auto set in Sender)
+            if (settings.key == null) {
+                settings.key = "${settings.topic}_key"
+                println("Generated message key = ${settings.key})")
+            }
 
             // wire
             val kafkaSender = KafkaSender(settings)
