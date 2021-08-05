@@ -38,15 +38,15 @@ class ToRevisionDiffProvider(
     private val gitClient: GitClient,
     private val provider: DiffProvider
 ) : DiffProvider {
-    override fun diff(request_: DiffRequest): DiffResponse {
-        var request = request_
-        if (request.toRevision == null) {
-            request = DiffRequest(
+    override fun diff(request: DiffRequest): DiffResponse {
+        var localRequest = request
+        if (localRequest.toRevision == null) {
+            localRequest = DiffRequest(
                 request.fromRevision,
                 gitClient.getHeadRevision()
             )
         }
-        return provider.diff(request)
+        return provider.diff(localRequest)
     }
 }
 
