@@ -4,6 +4,34 @@ Test the code:
 
     ../gradlew test
 
+# HTTP server-side
+
+In the `http_server` directory.
+
+Build the server app:
+
+    ../gradlew clean shadowJar
+
+Run the server app:
+
+    java -jar ./build/libs/http-server-all.jar -r /tmp/repo -p 8081
+
+Note:
+* pass `-j` to use JSON converted instead of UnifiedDiffConverter
+* pass `-c %path%` to use file system cache (make sure the directory exists)
+
+Request the changes:
+
+    curl "localhost:8081?from=87998e1759898200e386db4e29c7706a865adcd0&current=0"
+
+Note:
+* "from" - from revision changes are required (release)
+* "current" - current revision the client is on
+* both arguments are required
+
+In the response: the first line is actual HEAD revision (to be passed as "current" next time),
+the following lines are diff. If client is already on HEAD there will be no diff lines.
+
 # Kafka server-side
 
 In the `kafka_server` directory.
@@ -28,7 +56,7 @@ In the `src/test/resources` directory
     ...
     docker-compose down
 
-# Client-side
+# Kafka Client-side
 
 In project root directory.
 
