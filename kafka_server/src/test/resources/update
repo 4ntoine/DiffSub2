@@ -8,10 +8,14 @@ old_commit = sys.argv[2]
 new_commit = sys.argv[3]
 
 # Git diff
-git_proc = subprocess.Popen("git diff -w %s %s" % (old_commit, new_commit), shell=True, stdout=subprocess.PIPE)
+git_proc = subprocess.Popen(
+    "git diff -w %s %s" % (old_commit, new_commit),
+    shell=True, stdout=subprocess.PIPE)
 git_diff_output = "".join(git_proc.stdout.readlines())
 
-# Feed it to the server app
-server_app_proc = subprocess.Popen("java -jar ./hooks/server-all.jar -h localhost -p 29092 -t diffsub2 -a send", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+# Feed it to the Kafka server app
+server_app_proc = subprocess.Popen(
+    "java -jar ./hooks/kafka-server-all.jar -h localhost -p 29092 -t diffsub2 -a send",
+    shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 server_app_output = server_app_proc.communicate(input=git_diff_output.encode())[0]
 print(server_app_output)
