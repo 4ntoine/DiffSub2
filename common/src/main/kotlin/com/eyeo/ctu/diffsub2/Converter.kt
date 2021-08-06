@@ -1,6 +1,5 @@
 package com.eyeo.ctu.diffsub2
 
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
 import java.io.InputStreamReader
@@ -80,7 +79,9 @@ class JsonConverter : Converter {
     }
 
     override fun convert(input: ByteArray): Diff {
-        val changes = gson.fromJson(InputStreamReader(input.inputStream()), Changes::class.java)
+        val changes = gson.fromJson(
+            InputStreamReader(input.inputStream()),
+            Changes::class.java)
         return Diff(changes.filters.add, changes.filters.remove)
     }
 }
