@@ -46,10 +46,11 @@ class CachingDiffProcessor(
 ) : DiffProcessor {
     override fun diff(revisions: Revisions, context: DiffContext): String {
         // ignore racing for the simplicity
-        var diff = cache.get(revisions)
+        val actualRevisions = Revisions(revisions.from, context.headRevision!!)
+        var diff = cache.get(actualRevisions)
         if (diff == null) {
-            diff = processor.diff(revisions, context)
-            cache.put(revisions, diff!!)
+            diff = processor.diff(actualRevisions, context)
+            cache.put(actualRevisions, diff!!)
         }
         return diff
     }

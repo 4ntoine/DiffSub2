@@ -71,9 +71,10 @@ class DiffProcessorTest {
         val cachingProcessor = CachingDiffProcessor(cache, processor)
         val revisions = Revisions("from", "to")
         val context = DiffContext()
+        context.headRevision = "head"
         val response1 = cachingProcessor.diff(revisions, context)
         assertEquals(response, response1)
-        assertEquals(response, cache.get(revisions))
+        assertEquals(response, cache.get(Revisions(revisions.from, context.headRevision!!)))
         assertEquals(1, processor.callCounter)
         val response2 = cachingProcessor.diff(revisions, context)
         assertEquals(response, response2)
