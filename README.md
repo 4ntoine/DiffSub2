@@ -4,9 +4,9 @@ Test the code:
 
     ../gradlew test
 
-# Server-side
+# Kafka server-side
 
-In the `server` directory.
+In the `kafka_server` directory.
 
 Build the server app:
 
@@ -14,7 +14,7 @@ Build the server app:
 
 Test the app manually:
 
-    cat src/test/resources/diff.txt | java -jar ./build/libs/server-all.jar
+    cat src/test/resources/diff.txt | java -jar ./build/libs/kafka-server-all.jar
 
 Set up the Git hook:
 
@@ -34,7 +34,7 @@ In project root directory.
 
 Start-up Docker-compose and (optionally) create a topic with Server app:
 
-    java -jar ./server/build/libs/server-all.jar -h localhost -p 29092 -t diffsub2 -a create
+    java -jar ./kafka_server/build/libs/kafka-server-all.jar -h localhost -p 29092 -t diffsub2 -a create
 
 Compile the source code and start the client:
 
@@ -42,7 +42,7 @@ Compile the source code and start the client:
 
 Send a test diff with server app:
 
-    cat server/src/test/resources/diff.txt | java -jar ./server/build/libs/server-all.jar -h localhost -p 29092 -t diffsub2 -a send
+    cat server/src/test/resources/diff.txt | java -jar ./server/build/libs/kafka-server-all.jar -h localhost -p 29092 -t diffsub2 -a send
 
 Use `-k` to pass a specific message key to be used while sending.
 

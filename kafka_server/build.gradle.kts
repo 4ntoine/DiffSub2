@@ -20,5 +20,5 @@ application {
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    archiveFileName.set("server-all.jar")
+    archiveFileName.set("kafka-server-all.jar")
 }

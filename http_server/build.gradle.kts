@@ -7,6 +7,7 @@ plugins {
 dependencies {
     implementation(project(":common"))
     testImplementation(kotlin("test"))
+    implementation("org.slf4j:slf4j-nop:1.7.32") // to hide slf4j "Not configured" output
     implementation("org.nanohttpd:nanohttpd:2.3.0")
 }
 
@@ -19,5 +20,5 @@ application {
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    archiveFileName.set("server-all.jar")
+    archiveFileName.set("http-server-all.jar")
 }
