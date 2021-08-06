@@ -4,7 +4,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -16,12 +15,12 @@ class DiffCacheTest {
 
     @Test
     fun testInMemoryCache() {
-        val request = DiffRequest("from", "to")
-        val response = DiffResponse("body", "head")
+        val request = Revisions("from", "to")
+        val diffBody = "body"
         val cache: DiffCache = InMemoryDiffCache()
         assertNull(cache.get(request))
-        cache.put(request, response)
-        assertEquals(response, cache.get(request))
+        cache.put(request, diffBody)
+        assertEquals(diffBody, cache.get(request))
         cache.clear()
         assertNull(cache.get(request))
     }
@@ -37,15 +36,14 @@ class DiffCacheTest {
     @Test
     fun testFileSystemCache() {
         fileSystemCache.clear()
-        val request = DiffRequest("from1", "to1")
+        val request = Revisions("from1", "to1")
         assertNull(fileSystemCache.get(request))
-        val expectedResponse = DiffResponse("body1", request.toRevision!!)
-        fileSystemCache.put(request, expectedResponse)
+        val expectedDiffBody = "body1"
+        fileSystemCache.put(request, expectedDiffBody)
         assertTrue(fileSystemCache.getResponseFile(request).exists())
-        val actualResponse = fileSystemCache.get(request)
-        assertNotNull(actualResponse)
-        assertEquals(expectedResponse.diffBody, actualResponse.diffBody)
-        assertEquals(expectedResponse.headRevision, actualResponse.headRevision)
+        val actualDiffBody = fileSystemCache.get(request)
+        assertNotNull(actualDiffBody)
+        assertEquals(expectedDiffBody, actualDiffBody)
         fileSystemCache.clear()
         assertNull(fileSystemCache.get(request))
     }

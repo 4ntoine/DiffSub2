@@ -14,9 +14,8 @@ fun execute(command: Array<String>): List<String> {
 }
 
 // Git client
-interface GitClient {
-    fun getHeadRevision(): String
-    fun getDiff(fromRevision: String, toRevision: String): String
+interface GitClient : DiffProcessor {
+    fun headRevision(): String
 }
 
 // GitClient impl that launches Git binary via command line
@@ -32,14 +31,14 @@ class InvokingGitClient(
         return execute(allCmd.toTypedArray())
     }
 
-    override fun getHeadRevision(): String {
+    override fun headRevision(): String {
         val output = executeGit(arrayOf("rev-parse", "HEAD"))
         return output.first().trim()
     }
 
-    override fun getDiff(fromRevision: String, toRevision: String): String {
+    override fun diff(revisions: Revisions, /* not actually used */ context: DiffContext): String {
         val spaceChangeArg = if (ignoreSpaceChangeLines) "-w" else ""
-        val output = executeGit(arrayOf("diff", spaceChangeArg, fromRevision, toRevision))
+        val output = executeGit(arrayOf("diff", spaceChangeArg, revisions.from, revisions.to))
         return output.joinToString("\n")
     }
 }

@@ -6,25 +6,25 @@ import java.io.FileFilter
 // saves responses for requests
 interface DiffCache {
     // returns `null` if having nothing (no separate `has()`)
-    fun get(request: DiffRequest): DiffResponse?
-    fun put(request: DiffRequest, response: DiffResponse)
+    fun get(revisions: Revisions): String?
+    fun put(revisions: Revisions, diff: String)
     fun clear()
 }
 
 // DiffCache impl that keeps everything in memory
 class InMemoryDiffCache : DiffCache {
-    private val map = mutableMapOf<DiffRequest, DiffResponse>()
+    private val map = mutableMapOf<Revisions, String>()
 
     override fun clear() {
         map.clear()
     }
 
-    override fun get(request: DiffRequest): DiffResponse? {
-        return map[request]
+    override fun get(revisions: Revisions): String? {
+        return map[revisions]
     }
 
-    override fun put(request: DiffRequest, response: DiffResponse) {
-        map[request] = response
+    override fun put(revisions: Revisions, diff: String) {
+        map[revisions] = diff
     }
 }
 
@@ -40,26 +40,25 @@ class FileSystemDiffCache(
     private fun escapeString(s: String) = s.replace("\\W+".toRegex(), "")
 
     // relative filename for the response file according to the request
-    private fun getResponseFileName(request: DiffRequest): String {
-        return "${escapeString(request.fromRevision)}_${escapeString(request.toRevision!!)}.$fileExtension"
+    private fun getResponseFileName(request: Revisions): String {
+        return "${escapeString(request.from)}_${escapeString(request.to)}.$fileExtension"
     }
 
-    fun getResponseFile(request: DiffRequest): File {
+    fun getResponseFile(request: Revisions): File {
         return File(directory, getResponseFileName(request))
     }
 
-    override fun get(request: DiffRequest): DiffResponse? {
-        val file = getResponseFile(request)
+    override fun get(revisions: Revisions): String? {
+        val file = getResponseFile(revisions)
         if (!file.exists()) {
             return null
         }
-        val diffBody = file.readText()
-        return DiffResponse(diffBody, request.toRevision!!)
+        return file.readText()
     }
 
-    override fun put(request: DiffRequest, response: DiffResponse) {
-        val file = getResponseFile(request)
-        file.writeText(response.diffBody)
+    override fun put(revisions: Revisions, diff: String) {
+        val file = getResponseFile(revisions)
+        file.writeText(diff)
     }
 
     private val cachedFilesFilter = FileFilter { file ->

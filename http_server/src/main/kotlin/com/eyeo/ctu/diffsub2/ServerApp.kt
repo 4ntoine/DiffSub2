@@ -6,7 +6,7 @@ import java.io.File
 import kotlin.system.exitProcess
 
 class ServerApp(
-    private val provider: DiffProvider,
+    private val processor: DiffProcessor,
     private val server: DiffServer
 ) {
     class Settings {
@@ -32,7 +32,7 @@ class ServerApp(
     }
 
     init {
-        server.setDiffProvider(provider)
+        server.setDiffProvider(processor)
     }
 
     fun start() {
@@ -72,22 +72,25 @@ class ServerApp(
                     println("Cache path (${settings.cachePath}) does not exist!")
                     exitProcess(3)
                 }
+                println("Using file system cache (${settings.cachePath})")
                 FileSystemDiffCache(cacheDir)
             } else {
                 println("Using in-memory cache")
                 InMemoryDiffCache()
             }
             val app = ServerApp(
-                ToRevisionDiffProvider( // 1 - add 'ToRevision' if it's missing
+                AddHeadDiffProcessor(                 // 1 - add HEAD info to the context
                     gitClient,
-                    CachingDiffProvider( // 2 - cache for better performance
-                        cache,
-                        GitDiffProvider( // 3 - actually request Git about the changes
-                            InvokingGitClient(gitRepoDir),
-                            ThombergsDiffParser(),
-                            GitLikeConverter()
+                    AlreadyOnHeadCheckDiffProcessor(  // 2 - check if the client is already on HEAD
+                        CachingDiffProcessor(         // 3 - cache for better performance
+                            cache,
+                            GitDiffProcessor(         // 4 - actually request ...
+                                gitClient,            // 5 - ... from Git
+                                ThombergsDiffParser(),
+                                GitLikeConverter()
+                            )
                         )
-                    )
+                    ),
                 ),
                 HttpDiffServer(settings.port!!)
             )
