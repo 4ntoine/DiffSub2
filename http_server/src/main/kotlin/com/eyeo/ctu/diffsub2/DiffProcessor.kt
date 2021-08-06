@@ -64,8 +64,8 @@ class GitDiffProcessor(
 ) : DiffProcessor {
     override fun diff(revisions: Revisions, context: DiffContext): String {
         // "revisions.to" contains "current" client revision
-        val revisions = Revisions(revisions.from, context.headRevision!!)
-        val gitDiff = processor.diff(revisions, context)
+        val actualRevisions = Revisions(revisions.from, context.headRevision!!)
+        val gitDiff = processor.diff(actualRevisions, context)
         val diff = parser.parse(gitDiff!!)
         val diffResponseBody = converter.convert(diff)
         return String(diffResponseBody)

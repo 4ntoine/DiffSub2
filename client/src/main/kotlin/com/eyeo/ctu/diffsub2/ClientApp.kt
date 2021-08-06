@@ -76,7 +76,7 @@ class ClientApp(
             // wire
             val app = ClientApp(
                 KafkaReceiver(settings),
-                GitLikeConverter(),
+                UnifiedDiffConverter(),
                 PrintingFilterManager()
             )
 

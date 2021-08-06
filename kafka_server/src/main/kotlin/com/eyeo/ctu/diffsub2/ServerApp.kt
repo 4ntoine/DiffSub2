@@ -65,7 +65,7 @@ class ServerApp(
             val kafkaSender = KafkaSender(settings)
             val app = ServerApp(
                 ThombergsDiffParser(),
-                GitLikeConverter(),
+                UnifiedDiffConverter(),
                 kafkaSender
             )
 

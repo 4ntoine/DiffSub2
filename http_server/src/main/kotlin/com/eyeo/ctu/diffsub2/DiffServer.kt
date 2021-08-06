@@ -60,9 +60,9 @@ class HttpDiffServer(
             // Note: `context.headRevision` is set during the `diff()`
             val responseBuilder = StringBuilder(context.headRevision)
             // trivial mark-up: first line is HEAD, next - diff
-            diff?.let { diff -> // it can be `null` if the client is already on the HEAD
+            diff?.let { diffBody -> // it can be `null` if the client is already on the HEAD
                 responseBuilder.append("\n")
-                responseBuilder.append(diff)
+                responseBuilder.append(diffBody)
             }
             return newFixedLengthResponse(responseBuilder.toString())
         } catch (e: Exception) {

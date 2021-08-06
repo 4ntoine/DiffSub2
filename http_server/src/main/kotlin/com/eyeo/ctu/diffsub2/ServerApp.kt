@@ -29,6 +29,12 @@ class ServerApp(
             description = "File system cache absolute path (using in-memory cache if not set)"
         )
         var cachePath: String? = null
+
+        @Parameter(
+            names = ["-j", "--json"],
+            description = "Use JSON converter (using GitLikeConverter if not set)"
+        )
+        var jsonConverter: Boolean = false
     }
 
     init {
@@ -78,6 +84,10 @@ class ServerApp(
                 println("Using in-memory cache")
                 InMemoryDiffCache()
             }
+            val converter = if (settings.jsonConverter)
+                JsonConverter()
+            else
+                UnifiedDiffConverter()
             val app = ServerApp(
                 AddHeadDiffProcessor(                 // 1 - add HEAD info to the context
                     gitClient,
@@ -87,7 +97,7 @@ class ServerApp(
                             GitDiffProcessor(         // 4 - actually request ...
                                 gitClient,            // 5 - ... from Git
                                 ThombergsDiffParser(),
-                                GitLikeConverter()
+                                converter
                             )
                         )
                     ),

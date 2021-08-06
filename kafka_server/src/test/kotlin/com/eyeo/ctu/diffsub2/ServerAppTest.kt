@@ -46,7 +46,7 @@ class ServerAppTest {
         val output = ByteArrayOutputStream()
         val app = ServerApp(
             ThombergsDiffParser(),
-            GitLikeConverter(),
+            UnifiedDiffConverter(),
             OutputSender(output)
         )
         app.onHook(diffInput)
@@ -69,7 +69,7 @@ class ServerAppTest {
         }
         val app = ServerApp(
             ThombergsDiffParser(),
-            GitLikeConverter(),
+            UnifiedDiffConverter(),
             KafkaSender(settings)
         )
         try {

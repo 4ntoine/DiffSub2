@@ -87,7 +87,7 @@ class DiffProcessorTest {
         val processor: DiffProcessor = GitDiffProcessor(
             gitClient,
             ThombergsDiffParser(),
-            GitLikeConverter()
+            UnifiedDiffConverter()
         )
         val context = DiffContext()
         val diff = processor.diff(Revisions("HEAD", "HEAD~"), context)

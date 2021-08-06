@@ -43,7 +43,7 @@ class ClientAppTest {
 
         val app = ClientApp(
             receiver,
-            GitLikeConverter(),
+            UnifiedDiffConverter(),
             filterManager
         )
         app.start()

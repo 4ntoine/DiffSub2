@@ -4,7 +4,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class ConverterTest {
-    private val converter: Converter = GitLikeConverter()
+    private val converter: Converter = UnifiedDiffConverter()
 
     // Note: the test assumes some rules order in Diff though it's not guaranteed by the impl
     // TODO: refactor to ignore the rules order
@@ -78,5 +78,32 @@ class ConverterTest {
         val actualDiff = converter.convert("".toByteArray())
         assertEquals(0, actualDiff.add.size)
         assertEquals(0, actualDiff.remove.size)
+    }
+
+    @Test
+    fun testGson() {
+        val rule1 = "Rule1"
+        val rule2 = "Rule2"
+        val diff = Diff(listOf(rule1), listOf(rule2))
+        val converter = JsonConverter()
+        val output = String(converter.convert(diff))
+        assertEquals(
+            """
+            {
+              "filters": {
+                "add": [
+                  "Rule1"
+                ],
+                "remove": [
+                  "Rule2"
+                ]
+              }
+            }
+            """.trimIndent(), output)
+        val diff2 = converter.convert(output.toByteArray())
+        assertEquals(1, diff2.add.size)
+        assertEquals(rule1, diff2.add.first())
+        assertEquals(1, diff2.remove.size)
+        assertEquals(rule2, diff2.remove.first())
     }
 }
