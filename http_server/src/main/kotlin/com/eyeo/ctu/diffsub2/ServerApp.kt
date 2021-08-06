@@ -11,7 +11,7 @@ class ServerApp(
 ) {
     class Settings {
         @Parameter(
-            names = ["-r", "-repo"],
+            names = ["-r", "-repo_path"],
             description = "Git repository absolute path",
             required = true
         )
@@ -23,6 +23,12 @@ class ServerApp(
             required = true
         )
         var port: Int? = null
+
+        @Parameter(
+            names = ["-c", "-cache_path"],
+            description = "File system cache absolute path (using in-memory cache if not set)"
+        )
+        var cachePath: String? = null
     }
 
     init {
@@ -54,19 +60,30 @@ class ServerApp(
             }
 
             // wire
-            val gitRepoPath = File(settings.repoPath!!)
-            if (!gitRepoPath.exists()) {
-                println("Git repository does not exist!")
+            val gitRepoDir = File(settings.repoPath!!)
+            if (!gitRepoDir.exists()) {
+                println("Git repository path (${settings.repoPath}) does not exist!")
                 exitProcess(2)
             }
-            val gitClient = InvokingGitClient(gitRepoPath)
+            val gitClient = InvokingGitClient(gitRepoDir)
+            val cache = if (settings.cachePath != null) {
+                val cacheDir = File(settings.cachePath!!)
+                if (!cacheDir.exists()) {
+                    println("Cache path (${settings.cachePath}) does not exist!")
+                    exitProcess(3)
+                }
+                FileSystemDiffCache(cacheDir)
+            } else {
+                println("Using in-memory cache")
+                InMemoryDiffCache()
+            }
             val app = ServerApp(
                 ToRevisionDiffProvider( // 1 - add 'ToRevision' if it's missing
                     gitClient,
                     CachingDiffProvider( // 2 - cache for better performance
-                        InMemoryDiffCache(),
+                        cache,
                         GitDiffProvider( // 3 - actually request Git about the changes
-                            InvokingGitClient(gitRepoPath),
+                            InvokingGitClient(gitRepoDir),
                             ThombergsDiffParser(),
                             GitLikeConverter()
                         )
