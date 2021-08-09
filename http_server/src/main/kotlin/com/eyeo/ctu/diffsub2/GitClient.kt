@@ -4,7 +4,7 @@ import java.io.File
 
 // execute the command line and return the process output (stdout)
 fun execute(command: Array<String>): List<String> {
-    val p = Runtime.getRuntime().exec(command, null)
+    val p = Runtime.getRuntime().exec(command)
     val output = p.inputStream.bufferedReader().readLines()
     val resultCode = p.waitFor()
     if (resultCode != 0) {
